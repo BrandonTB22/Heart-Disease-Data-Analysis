@@ -22,7 +22,7 @@ library(Amelia)
 rawData <- read.csv('./dataset/heart.csv',header=T)
 head(rawData)
 ```
-<<<<<<< HEAD
+
 
 ```{r}
 # Look for any missing or weird values and see how many unique values each column has
@@ -40,10 +40,6 @@ missmap(rawData, main="Missing values")
 
 
 ```{r}
-=======
-## Some text
-## Including Plots
->>>>>>> 6a6fd874e3cb62a4590f11c4f874ce18a0f668e9
 
 ```
 
