@@ -24,6 +24,11 @@ head(rawData)
 ```
 
 
+=======
+## Some text
+## Including Plots
+>>>>>>> 6a6fd874e3cb62a4590f11c4f874ce18a0f668e9
+
 ```{r}
 # Look for any missing or weird values and see how many unique values each column has
 sapply(rawData,function(x) sum(is.na(x))) 
