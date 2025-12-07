@@ -19,7 +19,7 @@ library(Amelia)
 
 ```{r}
     getwd()
-rawData <- read.csv('C:/Users/btbou/Downloads/archive (4)/heart.csv',header=T)
+rawData <- read.csv('./dataset/heart.csv',header=T)
 head(rawData)
 ```
 
