@@ -68,13 +68,10 @@ median(rawData$chol, rm.na=T) # ~ 240
 
 ```
 ```{r}
-#hello, this is emily testing
-#This is Emily testing github
-#I do not think this is working haha
 head(rawData)
-
-#hello - emily
-
+```
+```{r}
+#emily testing github part 5
 ```
 
 
