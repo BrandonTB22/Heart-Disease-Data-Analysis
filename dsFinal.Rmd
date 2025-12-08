@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 # Required dependencies (put all here)
 library(Amelia)
+library(dplyr)
 ```
 
 
@@ -21,6 +22,7 @@ library(Amelia)
     getwd()
 rawData <- read.csv('./dataset/heart.csv',header=T)
 head(rawData)
+# d
 ```
 
 
@@ -40,11 +42,33 @@ sapply(rawData,function(x) length(unique(x)))
 # We know there are no missing values, but we are going to visualize just to be sure 
 missmap(rawData, main="Missing values")
 
-# Observed = 100% which is great because that means there are no missing values
+# Observed = 100% which is great because that means there are no missing values. But we will have to look for non-physiological (values that don't make sense clinically).
+
+# Looking at the unique values, they tend to make sense. Chol and thalach both have a lot of unique values, but this makes sense considering that both cholestoral levels and heart rate can affect
+
 ```
 
 
 ```{r}
+# Next, we will look for any possible outliers
+summary(rawData)
+
+# Chol might have outliers.
+boxplot(rawData$chol)
+
+# We have a few outliers chol above ~ 350. There are about 26 total outiers. We can impute with the mean
+cho350 <- rawData %>% 
+                filter(chol > 350) %>% 
+                select(chol)
+
+# Check mean and median for best value
+mean(rawData$chol, rm.na=T) # ~ 246
+median(rawData$chol, rm.na=T) # ~ 240
+
+# The values don't differ significantly. We will impute the mean
+
+
+
 
 ```
 
