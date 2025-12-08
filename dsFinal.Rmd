@@ -46,9 +46,8 @@ missmap(rawData, main="Missing values")
 
 ```
 
-
 ```{r}
-<<<<<<< HEAD
+
 
 # Next, we will look for any possible outliers
 summary(rawData)
@@ -70,10 +69,14 @@ median(rawData$chol, rm.na=T) # ~ 240
 ```
 ```{r}
 #hello, this is emily testing
-=======
 #This is Emily testing github
 #I do not think this is working haha
 head(rawData)
->>>>>>> 2766999 (Emily)
+
+#hello - emily
+
 ```
+
+
+
 
