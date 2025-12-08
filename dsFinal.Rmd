@@ -48,6 +48,7 @@ missmap(rawData, main="Missing values")
 
 
 ```{r}
+<<<<<<< HEAD
 
 # Next, we will look for any possible outliers
 summary(rawData)
@@ -67,5 +68,8 @@ median(rawData$chol, rm.na=T) # ~ 240
 # The values don't differ significantly. We will impute the mean
 
 
+=======
+#This is Emily testing github
+>>>>>>> 1eff4f8 (hello?\)
 ```
 
