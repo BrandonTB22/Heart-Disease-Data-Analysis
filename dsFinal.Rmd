@@ -13,6 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 # Required dependencies (put all here)
 library(Amelia)
 library(dplyr)
+library(caret)
+
+set.seed(123) # DO NOT CHANGE
 ```
 
 
@@ -25,15 +28,10 @@ head(rawData)
 # d
 ```
 
-
-## Some text
-## Including Plots
-
 ```{r}
 # Look for any missing or weird values and see how many unique values each column has
 sapply(rawData,function(x) sum(is.na(x))) 
 sapply(rawData,function(x) length(unique(x))) 
-
 ```
 
 ```{r}
@@ -42,12 +40,28 @@ missmap(rawData, main="Missing values")
 
 # Observed = 100% which is great because that means there are no missing values. But we will have to look for non-physiological (values that don't make sense clinically).
 
-# Looking at the unique values, they tend to make sense. Chol and thalach both have a lot of unique values, but this makes sense considering that both cholestoral levels and heart rate can affect
+# Looking at the unique values, they tend to make sense. Chol and thalach both have a lot of unique values, but this makes sense considering that both cholestorol levels and heart rate can vary significantly
 
 ```
 
 ```{r}
+# Since our data set has clinical data, there may be data here that is not physiologically possible.
+summary(rawData)
 
+# Some variables have extreme numbers, but are still physically possible to achieve We don' have any unusually low numbers, so we do not have to won't about that. The column that sticks out is ca (number of major vessels (0-3) colored by flourosopy). We can see that the max is 4, but this column is only supposed to contain the numbers 0-3.
+
+# Since we want to keep this data, we will have to replace it. Since it is a non-numeric value, we will replace it with the most frequently occurring value.
+mostFreqOccur <- rawData %>% count(ca)
+print(mostFreqOccur)
+
+# The most common number if 0, so we will impute the values that have 4 with the value 0.
+# Easiest way to make the values na and replace the na values with 0. We will just keep tham as na until we split the raw dat into testing and training sets
+
+rawData$ca[rawData$ca == 4] <- NA
+
+```
+
+```{r}
 
 # Next, we will look for any possible outliers
 summary(rawData)
@@ -55,23 +69,49 @@ summary(rawData)
 # Chol might have outliers.
 boxplot(rawData$chol)
 
-# We have a few outliers chol above ~ 350. There are about 26 total outiers. We can impute with the mean
+# We have a few outliers chol above ~ 350. There are about 26 total outiers.
 cho350 <- rawData %>% 
                 filter(chol > 350) %>% 
                 select(chol)
 
-# Check mean and median for best value
-mean(rawData$chol, rm.na=T) # ~ 246
-median(rawData$chol, rm.na=T) # ~ 240
+# We will deal with the outliers by using the log function
+summary(log(rawData$chol)) # Smaller range, so there should be no skew
 
-# The values don't differ significantly. We will impute the mean
+heart_disease <- rawData
+heart_disease$chol <- log(heart_disease$chol)
+
+# See the new data frame with updated values
+head(heart_disease)
 
 ```
+
 ```{r}
-head(rawData)
+# We need to treat the categorical variables as factor. As mentioned before, all of the data is encoded numerically, meaning that our categorical variables are represented by numbers.
+
+# Categorical variables: sex, cp, fbs restecg, exang, slope, ca, thal
+heart_disease$sex<- as.factor(heart_disease$sex)
+heart_disease$cp <- as.factor(heart_disease$cp)
+heart_disease$fbs<- as.factor(heart_disease$fbs)
+heart_disease$restecg <- as.factor(heart_disease$restecg)
+heart_disease$exang <- as.factor(heart_disease$exang)
+heart_disease$slope <- as.factor(heart_disease$slope)
+heart_disease$ca <- as.factor(heart_disease$ca)
+heart_disease$thal<- as.factor(heart_disease$thal)
+
+head(heart_disease) # Make sure the headers of the categorical variables are now factors
 ```
+
 ```{r}
-#emily testing github part 5
+# Splitting the raw data into training and testing set. ~ 80% of out data will be used for the training, and ~ 20% will be used for testing
+
+intrain <- createDataPartition(y = heart_disease$target, p = 0.8, list = FALSE)
+
+hd_training <- heart_disease[intrain,] #Create training set
+hd_testing <- heart_disease[-intrain,] #Create testing
+
+# Now we will impute 0 for the rows that have 4 in ca
+hd_training$ca[is.na(hd_training$ca)] <- 0
+hd_testing$ca[is.na(hd_testing$ca)] <- 0
 ```
 
 
