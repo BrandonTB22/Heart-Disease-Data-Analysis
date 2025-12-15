@@ -1,0 +1,70 @@
+---
+title: "logistic_regression_hd"
+output: html_document
+---
+
+```{r}
+load("heart_disease_split.RData")
+
+head(hd_training)
+head(hd_testing)
+```
+
+
+
+```{r}
+# Fit logistic regression model
+log_model <- glm(
+  target ~ .,
+  data = hd_training,
+  family = binomial
+)
+
+# View model summary
+summary(log_model)
+
+```
+
+```{r}
+# Predict probabilities
+test_prob <- predict(
+  log_model,
+  newdata = hd_testing,
+  type = "response"
+)
+
+head(test_prob)
+
+```
+
+```{r}
+# Class label conversion
+test_pred <- ifelse(test_prob >= 0.5, 1, 0)
+
+# Convert to factor for caret
+test_pred <- factor(test_pred, levels = c(0,1))
+hd_testing$target <- factor(hd_testing$target, levels = c(0,1))
+
+```
+
+```{r}
+confusionMatrix(test_pred, hd_testing$target)
+
+```
+
+```{r}
+plot_data <- hd_testing
+plot_data$pred_prob <- test_prob
+
+#Graph of probability -v- outcome
+boxplot(
+  pred_prob ~ target,
+  data = plot_data,
+  col = c("lightgray", "lightblue"),
+  names = c("No Heart Disease", "Heart Disease"),
+  ylab = "Predicted Probability",
+  main = "Predicted Probabilities by True Outcome"
+)
+
+```
+
