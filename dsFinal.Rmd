@@ -115,5 +115,18 @@ hd_testing$ca[is.na(hd_testing$ca)] <- 0
 ```
 
 
+```{r}
+# Simple chart of the proportions: this chart is the foundation of the data, it being balanced is a good thing. 
+barplot(
+  table(heart_disease$target),
+  col = c("green4", "red3"),
+  names.arg = c("No Heart Disease", "Heart Disease"),
+  main = "Distribution of Heart Disease Outcome",
+  ylab = "Count"
+)
+
+```
+
+
 
 
