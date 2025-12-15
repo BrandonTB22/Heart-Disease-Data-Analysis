@@ -5,6 +5,7 @@ output: html_document
 
 ```{r}
 set.seed(123)
+
 # Loads the train and test sets
 load("heart_disease_split.RData")
 load("heart_disease_cleaned.RData")
@@ -14,15 +15,111 @@ head(hd_training)
 head(hd_testing)
 head(heart_disease)
 
+# Copy the data set
+heart_diseaseKNN <- heart_disease
+
+heart_diseaseKNN$ca[is.na(heart_diseaseKNN$ca)] <- 0 # Make sure there are no NA values
+
+
 
 ```
+
+```{r}
+ggplot(heart_diseaseKNN, aes(target, after_stat(count))) + geom_bar(aes(fill = ca), position = "dodge")
+```
+
 
 ```{r}
 # --- KNN Pre processing ---
 
 # All of our numerically categorical values are now factors, so we can make a dummy variable for all of them
-dummies <- dummyVars(
-  heart_disease_clean~., data = hd_training
-)
+dmySex <- dummyVars(" ~ sex", data=heart_diseaseKNN,fullRank=T) 
+dummySex <- data.frame(predict(dmySex, newdata= heart_diseaseKNN))
+
+dmyFbs <- dummyVars(" ~ fbs", data=heart_diseaseKNN,fullRank=T) 
+dummyFbs <- data.frame(predict(dmyFbs, newdata= heart_diseaseKNN))
+
+dmyRestecg <- dummyVars(" ~ restecg", data=heart_diseaseKNN, fullRank=T)
+dummyRestecg <- data.frame(predict(dmyRestecg, newdata=heart_diseaseKNN))
+
+dmyExang <- dummyVars(" ~ exang", data=heart_diseaseKNN, fullRank=T)
+dummyExang <- data.frame(predict(dmyExang, newdata=heart_diseaseKNN))
+
+dmySlope <- dummyVars(" ~ slope", data=heart_diseaseKNN, fullRank=T)
+dummySlope <- data.frame(predict(dmySlope, newdata=heart_diseaseKNN))
+
+dmyCa <- dummyVars(" ~ ca", data=heart_diseaseKNN, fullRank=T)
+dummayCa <- data.frame(predict(dmyCa, newdata=heart_diseaseKNN))
+
+dmythal <- dummyVars(" ~ thal", data=heart_diseaseKNN, fullRank=T)
+dummyThal <- data.frame(predict(dmythal, newdata=heart_diseaseKNN))
+
 ```
+
+```{r}
+# Add the newly created columns to the table
+newHD <- cbind(heart_diseaseKNN, dummySex, dummyFbs, dummyRestecg, dummyExang, dummySlope, dummayCa, dummyThal)
+newHD
+```
+
+```{r}
+# Delete the factor columns we no longer need
+newHD = subset(newHD, select = -c(2, 3, 6, 7, 9, 11, 12))
+newHD
+```
+```{r}
+# Regenerate the testing and training sets with the new data frame
+set.seed(123)
+intrainKNN <- createDataPartition(y = heart_diseaseKNN$target, p = 0.8, list = FALSE)
+
+trainingKNN <- newHD[intrainKNN,]
+testingKNN <- newHD[-intrainKNN,]
+```
+
+
+```{r}
+processminmaxHD <- preProcess(as.data.frame(trainingKNN), method=c("range")) 
+
+trainingKNN <- predict(processminmaxHD,newdata = trainingKNN) 
+
+summary(trainingKNN) # This ensures that everything is in range from 0 - 1
+```
+
+```{r}
+testingKNN <- predict(processminmaxHD,newdata = testingKNN) 
+summary(testingKNN)
+```
+```{r}
+set.seed(123)
+trainingKNN$target <- factor(trainingKNN$target) # Treat the target as a factor
+
+trCtrlHD <- trainControl(method="cv") 
+knn_fitHD <- train(target ~ ., data=trainingKNN, method = "knn", trControl = trCtrlHD, tuneLength = 20)
+
+knn_fitHD # 9 is the best value here
+```
+
+```{r}
+# Test the KNN model
+set.seed(123)
+test_pred_hd <- predict(knn_fitHD, newdata = testingKNN)
+test_actual_hd <- as.factor(testingKNN$target)
+confusionMatrix(test_actual_hd,test_pred_hd)
+```
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
 
