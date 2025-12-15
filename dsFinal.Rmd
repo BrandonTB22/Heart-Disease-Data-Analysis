@@ -25,7 +25,7 @@ set.seed(123) # DO NOT CHANGE
     getwd()
 rawData <- read.csv('./dataset/heart.csv',header=T)
 head(rawData)
-# d
+
 ```
 
 ```{r}
@@ -114,6 +114,18 @@ hd_training$ca[is.na(hd_training$ca)] <- 0
 hd_testing$ca[is.na(hd_testing$ca)] <- 0
 ```
 
+```{r}
+# Export cleaned data frame
+write.csv(heart_disease, "heart_disease_cleaned.csv", row.names = FALSE)
+
+#Export training and testing
+write.csv(hd_training, "heart_disease_train.csv", row.names = FALSE)
+write.csv(hd_testing, "heart_disease_test.csv", row.names = FALSE)
+```
+
+```{r}
+save(hd_training, hd_testing, file = "heart_disease_split.RData")
+```
 
 
 

@@ -1,0 +1,13 @@
+---
+title: "KNN_hd"
+output: html_document
+---
+
+```{r}
+load("heart_disease_split.RData")
+
+head(hd_training)
+head(hd_testing)
+
+```
+
