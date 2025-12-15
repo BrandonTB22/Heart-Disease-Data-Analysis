@@ -18,7 +18,6 @@ library(caret)
 set.seed(123) # DO NOT CHANGE
 ```
 
-
 ## R Markdown
 
 ```{r}
@@ -125,6 +124,8 @@ write.csv(hd_testing, "heart_disease_test.csv", row.names = FALSE)
 
 ```{r}
 save(hd_training, hd_testing, file = "heart_disease_split.RData")
+save(heart_disease, file = "heart_disease_cleaned.RData")
+
 ```
 
 ```{r}

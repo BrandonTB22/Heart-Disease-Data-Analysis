@@ -4,10 +4,25 @@ output: html_document
 ---
 
 ```{r}
+set.seed(123)
+# Loads the train and test sets
 load("heart_disease_split.RData")
+load("heart_disease_cleaned.RData")
 
+# Confirm that we can read them
 head(hd_training)
 head(hd_testing)
+head(heart_disease)
 
+
+```
+
+```{r}
+# --- KNN Pre processing ---
+
+# All of our numerically categorical values are now factors, so we can make a dummy variable for all of them
+dummies <- dummyVars(
+  heart_disease_clean~., data = hd_training
+)
 ```
 
