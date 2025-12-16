@@ -19,9 +19,6 @@ head(heart_disease)
 heart_diseaseKNN <- heart_disease
 
 heart_diseaseKNN$ca[is.na(heart_diseaseKNN$ca)] <- 0 # Make sure there are no NA values
-
-
-
 ```
 
 ```{r}

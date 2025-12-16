@@ -58,7 +58,10 @@ print(mostFreqOccur)
 
 rawData$ca[rawData$ca == 4] <- NA
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> ac221fae935883c9c85635f3e226f55f15149052
 ```
 
 ```{r}
@@ -140,6 +143,7 @@ barplot(
 )
 
 ```
+<<<<<<< HEAD
 ```{r}
 install.packages("rpart.plot")
 
@@ -177,5 +181,7 @@ dt_preds <- predict(dt_model, hd_testing, type = "class")
 confusionMatrix(dt_preds, hd_testing$target)
 ```
 
+=======
+>>>>>>> ac221fae935883c9c85635f3e226f55f15149052
 
 

@@ -1,6 +1,7 @@
 ---
 title: "logistic_regression_hd"
 output: html_document
+author: Emily Jones
 ---
 
 ```{r}
@@ -11,60 +12,37 @@ head(hd_testing)
 ```
 
 
-
 ```{r}
 # Fit logistic regression model
-log_model <- glm(
-  target ~ .,
-  data = hd_training,
-  family = binomial
+log_model <- glm(target ~ ., data = hd_training, family = binomial(link='logit')
 )
 
 # View model summary
 summary(log_model)
 
-```
+#A multi-variable logistic regression was used to identify predictors of heart disease. Several variables were statistically significant at the 0.05 level. Chest pain type, sex, number of major vessels, resting blood pressure, maximum heart rate achieved, exercise-induced angina, and ST depression were all significant predictors of heart disease. Chest pain type and number of major vessels showed particularly strong associations. Variables such as age, fasting blood sugar, and cholesterol were not statistically significant after controlling for other factors.
 
-```{r}
-# Predict probabilities
-test_prob <- predict(
-  log_model,
-  newdata = hd_testing,
-  type = "response"
-)
-
-head(test_prob)
+#Insignificant variables: age, chol, fbs1, restecg1, restecg2, slope1, slope2, thal1, thal2, thal3
+#Significant variables: sex1(male), cp1, cp2, cp3, trestbps, thalach, exang1, oldpeak, ca1, ca2, ca3.
 
 ```
 
 ```{r}
-# Class label conversion
-test_pred <- ifelse(test_prob >= 0.5, 1, 0)
-
-# Convert to factor for caret
-test_pred <- factor(test_pred, levels = c(0,1))
-hd_testing$target <- factor(hd_testing$target, levels = c(0,1))
-
+anova(log_model, test='Chisq')
 ```
 
 ```{r}
-confusionMatrix(test_pred, hd_testing$target)
-
+library(pscl)
+pR2(log_model)
 ```
-
 ```{r}
-plot_data <- hd_testing
-plot_data$pred_prob <- test_prob
+predictions <- predict(log_model, newdata = hd_testing, type="response")
 
-#Graph of probability -v- outcome
-boxplot(
-  pred_prob ~ target,
-  data = plot_data,
-  col = c("lightgray", "lightblue"),
-  names = c("No Heart Disease", "Heart Disease"),
-  ylab = "Predicted Probability",
-  main = "Predicted Probabilities by True Outcome"
-)
+pred_class <- ifelse(predictions >= 0.5, 1, 0)
 
+table(pred_class)
 ```
+
+
+
 
