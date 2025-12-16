@@ -1,0 +1,48 @@
+
+```{r}
+#This file includes the decision tree model, made by Jordan. 
+```
+
+
+```{r}
+#decision tree model
+library(rpart)
+library(rpart.plot)
+
+```
+```{r}
+load("heart_disease_split.RData")
+load("heart_disease_cleaned.RData")
+```
+
+```{r}
+
+### Make sure the target is a factor  
+
+hd_training$target <- as.factor(hd_training$target)
+hd_testing$target  <- as.factor(hd_testing$target)
+
+```
+```{r}
+#using clean/split data
+dt_model <- rpart(
+  target ~ .,
+  data = hd_training,
+  method = "class"
+)
+```
+```{r}
+#plot the tree
+# plot the tree with white → red scale
+rpart.plot(
+  dt_model,
+  type = 2,
+  extra = 104,
+  box.palette = c("white", "red"),  # white → deep red
+  shadow.col = "gray",
+  nn = TRUE
+)
+
+```
+
+
