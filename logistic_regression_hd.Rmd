@@ -1,6 +1,7 @@
 ---
 title: "logistic_regression_hd"
 output: html_document
+author: Emily Jones
 ---
 
 ```{r}
@@ -20,6 +21,9 @@ log_model <- glm(target ~ ., data = hd_training, family = binomial(link='logit')
 summary(log_model)
 
 #A multi-variable logistic regression was used to identify predictors of heart disease. Several variables were statistically significant at the 0.05 level. Chest pain type, sex, number of major vessels, resting blood pressure, maximum heart rate achieved, exercise-induced angina, and ST depression were all significant predictors of heart disease. Chest pain type and number of major vessels showed particularly strong associations. Variables such as age, fasting blood sugar, and cholesterol were not statistically significant after controlling for other factors.
+
+#Insignificant variables: age, chol, fbs1, restecg1, restecg2, slope1, slope2, thal1, thal2, thal3
+#Significant variables: sex1(male), cp1, cp2, cp3, trestbps, thalach, exang1, oldpeak, ca1, ca2, ca3.
 
 ```
 
