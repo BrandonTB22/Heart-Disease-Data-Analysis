@@ -21,8 +21,52 @@ heart_diseaseKNN$ca[is.na(heart_diseaseKNN$ca)] <- 0 # Make sure there are no NA
 ```
 
 ```{r}
-# See which columns are unique
-ggplot(heart_diseaseKNN, aes(target, after_stat(count))) + geom_bar(aes(fill = ca), position = "dodge")
+# See the relationship for each categorical variable
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels = c("No heart disease", "Heart disease")), after_stat(count))) + geom_bar(aes(fill = factor(sex, labels = c("male", "female"))), position = "dodge") + labs (fill = "sex", x = "Presence of Heart Disease", y = "Count")
+# More females here have heart disease
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels = c("No heart disease", "Heart disease")), after_stat(count))) + geom_bar(aes(fill = factor(cp, labels = c("0", "1", "2", "3"))), position = "dodge") + labs (fill = "Chest pain type", x = "Presence of Heart Disease", y = "Count")
+# Chest pain type definitely plays a role. No chest pain at all typically means no heart disease
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels = c("No heart disease", "Heart disease")), after_stat(count))) + geom_bar(aes(fill = factor(fbs, labels = c("Yes", "No"))), position = "dodge") + labs (fill = "Fasting Blood Surgar and gt 120 mg/dl", x = "Presence of Heart Disease", y = "Count")
+# This one is more hard to tell if this really has an effect on heart disease. I am going to keep it because there are more people who said "yes" and they have heart disease. There is also far fewer people that said "no" overall, explaining the graph.
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels = c("No heart disease", "Heart disease")), after_stat(count))) + geom_bar(aes(fill = factor(restecg, labels = c("0", "1", "2"))), position = "dodge") + labs (fill = "Resting electrocardiographic results", x = "Presence of Heart Disease", y = "Count")
+# Lower numbres are associated with no heart disease
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels = c("No heart disease", "Heart disease")), after_stat(count))) + geom_bar(aes(fill = factor(exang, labels = c("Yes", "No"))), position = "dodge") + labs (fill = "Exercise induced angina", x = "Presence of Heart Disease", y = "Count")
+# There is a clear correlation here. An answer of "Yes" is more common in people with heart disease.
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels = c("No heart disease", "Heart disease")), after_stat(count))) + geom_bar(aes(fill = factor(slope, labels = c("0", "1", "2"))), position = "dodge") + labs (fill = "Slope of the peak exercise ST segment", x = "Presence of Heart Disease", y = "Count")
+# Another clear difference between the two targets. Higher numbers are associated with heart disease
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels = c("No heart disease", "Heart disease")), after_stat(count))) + geom_bar(aes(fill = factor(ca, labels = c("0", "1", "2", "3"))), position = "dodge") + labs (fill = "Number of major vessels", x = "Presence of Heart Disease", y = "Count")
+# Lower number is associated with heart disease
+
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels = c("No heart disease", "Heart disease")), after_stat(count))) + geom_bar(aes(fill = factor(thal, labels = c("None", "Normal", "Fixed defect", "Reversable defect"))), position = "dodge") + labs (fill = "Thalassemia type", x = "Presence of Heart Disease", y = "Count")
+# Clear correlation. Fixed defect is highly associated with heart disease.
+
+```
+
+```{r}
+# I am going to check my numeric data using box plots
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels=c("No heart disease", "Heart disease")), y = age)) +  geom_boxplot() + labs (x ="Presence of Heart Disease", y= "Age")
+# This is actually surprising to me. You would think that older people would have a higher rate of heart disease. This plot shows that people who have heart disease are typically younger
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels=c("No heart disease", "Heart disease")), y = trestbps)) +  geom_boxplot() + labs (x ="Presence of Heart Disease", y= "Resting blood Pressure")
+# Here, the mean for both targets are almost the same, but their ranges differ, so we will keep it.
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels=c("No heart disease", "Heart disease")), y = chol)) +  geom_boxplot() + labs (x ="Presence of Heart Disease", y= "Cholestreol Level")
+# Again, another surprise. You would think that people with higher cholesterol would be higher, but it is actually the opposite in theis case.
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels=c("No heart disease", "Heart disease")), y = thalach)) +  geom_boxplot() + labs (x ="Presence of Heart Disease", y= "Maximum Heart Rate")
+# People who typically have an increased heart rate are more likely to have heart disease.
+
+ggplot(heart_diseaseKNN, aes(x = factor(target, labels=c("No heart disease", "Heart disease")), y = oldpeak)) +  geom_boxplot() + labs (x ="Presence of Heart Disease", y= "ST depression induced by exercise relative to rest")
+# Clear difference here. Lower number is associated more with heart disease.
+
+
 ```
 
 
@@ -122,7 +166,7 @@ set.seed(123)
 newHDtrain$target <- factor(newHDtrain$target) # Treat the target as a factor
 
 trCtrlHD <- trainControl(method="cv") 
-knn_fitHD <- train(target ~ ., data=newHDtrain, method = "knn", trControl = trCtrlHD, tuneGrid = 20)
+knn_fitHD <- train(target ~ ., data=newHDtrain, method = "knn", trControl = trCtrlHD, tuneGrid = expand.grid(k = c(9)))
 
 knn_fitHD # 9 is the best value here. This is what the model used
 ```
@@ -136,6 +180,6 @@ confusionMatrix(test_actual_hd,test_pred_hd)
 ```
 
 ```{r}
-# Summary: The KNN model did an okay job at predicting heart disease. We get a total accuracy of ~ 85 %, which is high but below 90% which is ideal. We also see that there are more false negatives than positives. In our situation, we would prefer that there be more false positives over false negatives. It could be fatal if someone actually has heart disease, but it goes undetected in the model. 
+# Summary: The KNN model did an okay job at predicting heart disease. We get a total accuracy of ~ 88%, which is high but below 90% which is ideal. We also see that there are more false negatives than positives. In our situation, we would prefer that there be more false positives over false negatives. It could be fatal if someone actually has heart disease, but it goes undetected in the model. 
 ```
 
