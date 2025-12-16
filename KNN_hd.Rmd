@@ -17,11 +17,11 @@ head(heart_disease)
 
 # Copy the data set
 heart_diseaseKNN <- heart_disease
-
-heart_diseaseKNN$ca[is.na(heart_diseaseKNN$ca)] <- 0 # Make sure there are no NA values
+heart_diseaseKNN$ca[is.na(heart_diseaseKNN$ca)] <- 0 # Make sure there are no NA values in the ca column
 ```
 
 ```{r}
+# See which columns are unique
 ggplot(heart_diseaseKNN, aes(target, after_stat(count))) + geom_bar(aes(fill = ca), position = "dodge")
 ```
 
@@ -29,94 +29,113 @@ ggplot(heart_diseaseKNN, aes(target, after_stat(count))) + geom_bar(aes(fill = c
 ```{r}
 # --- KNN Pre processing ---
 
-# All of our numerically categorical values are now factors, so we can make a dummy variable for all of them
-dmySex <- dummyVars(" ~ sex", data=heart_diseaseKNN,fullRank=T) 
-dummySex <- data.frame(predict(dmySex, newdata= heart_diseaseKNN))
+# All of our numerically categorical values are now factors, so we can make a dummy variable for all of them for the training set.
+# Since we have to use the same training and testing split, we must keep all the original sets and not create a new split.
+dmySex <- dummyVars(" ~ sex", data=hd_training,fullRank=T) 
+dummySex <- data.frame(predict(dmySex, newdata= hd_training))
 
-dmyFbs <- dummyVars(" ~ fbs", data=heart_diseaseKNN,fullRank=T) 
-dummyFbs <- data.frame(predict(dmyFbs, newdata= heart_diseaseKNN))
+dmyFbs <- dummyVars(" ~ fbs", data=hd_training,fullRank=T) 
+dummyFbs <- data.frame(predict(dmyFbs, newdata= hd_training))
 
-dmyRestecg <- dummyVars(" ~ restecg", data=heart_diseaseKNN, fullRank=T)
-dummyRestecg <- data.frame(predict(dmyRestecg, newdata=heart_diseaseKNN))
+dmyRestecg <- dummyVars(" ~ restecg", data=hd_training, fullRank=T)
+dummyRestecg <- data.frame(predict(dmyRestecg, newdata=hd_training))
 
-dmyExang <- dummyVars(" ~ exang", data=heart_diseaseKNN, fullRank=T)
-dummyExang <- data.frame(predict(dmyExang, newdata=heart_diseaseKNN))
+dmyExang <- dummyVars(" ~ exang", data=hd_training, fullRank=T)
+dummyExang <- data.frame(predict(dmyExang, newdata=hd_training))
 
-dmySlope <- dummyVars(" ~ slope", data=heart_diseaseKNN, fullRank=T)
-dummySlope <- data.frame(predict(dmySlope, newdata=heart_diseaseKNN))
+dmySlope <- dummyVars(" ~ slope", data=hd_training, fullRank=T)
+dummySlope <- data.frame(predict(dmySlope, newdata=hd_training))
 
-dmyCa <- dummyVars(" ~ ca", data=heart_diseaseKNN, fullRank=T)
-dummayCa <- data.frame(predict(dmyCa, newdata=heart_diseaseKNN))
+dmyCa <- dummyVars(" ~ ca", data=hd_training, fullRank=T)
+dummayCa <- data.frame(predict(dmyCa, newdata=hd_training))
 
-dmythal <- dummyVars(" ~ thal", data=heart_diseaseKNN, fullRank=T)
-dummyThal <- data.frame(predict(dmythal, newdata=heart_diseaseKNN))
+dmythal <- dummyVars(" ~ thal", data=hd_training, fullRank=T)
+dummyThal <- data.frame(predict(dmythal, newdata=hd_training))
 
 ```
 
 ```{r}
-# Add the newly created columns to the table
-newHD <- cbind(heart_diseaseKNN, dummySex, dummyFbs, dummyRestecg, dummyExang, dummySlope, dummayCa, dummyThal)
-newHD
+# Add the newly created columns to the train table
+newHDtrain <- cbind(hd_training, dummySex, dummyFbs, dummyRestecg, dummyExang, dummySlope, dummayCa, dummyThal)
 ```
 
 ```{r}
 # Delete the factor columns we no longer need
-newHD = subset(newHD, select = -c(2, 3, 6, 7, 9, 11, 12))
-newHD
+newHDtrain = subset(newHDtrain, select = -c(2, 3, 6, 7, 9, 11, 12))
+newHDtrain
+```
+
+```{r}
+# We have to do the same for the testing set
+dmySex2 <- dummyVars(" ~ sex", data=hd_testing,fullRank=T) 
+dummySex2 <- data.frame(predict(dmySex, newdata= hd_testing))
+
+dmyFbs2 <- dummyVars(" ~ fbs", data=hd_testing,fullRank=T) 
+dummyFbs2 <- data.frame(predict(dmyFbs, newdata= hd_testing))
+
+dmyRestecg2 <- dummyVars(" ~ restecg", data=hd_testing, fullRank=T)
+dummyRestecg2 <- data.frame(predict(dmyRestecg, newdata=hd_testing))
+
+dmyExang2 <- dummyVars(" ~ exang", data=hd_testing, fullRank=T)
+dummyExang2 <- data.frame(predict(dmyExang, newdata=hd_testing))
+
+dmySlope2 <- dummyVars(" ~ slope", data=hd_testing, fullRank=T)
+dummySlope2 <- data.frame(predict(dmySlope, newdata=hd_testing))
+
+dmyCa2 <- dummyVars(" ~ ca", data=hd_testing, fullRank=T)
+dummayCa2 <- data.frame(predict(dmyCa, newdata=hd_testing))
+
+dmythal2 <- dummyVars(" ~ thal", data=hd_testing, fullRank=T)
+dummyThal2 <- data.frame(predict(dmythal, newdata=hd_testing))
+
+
+```
+
+```{r}
+# Add the new data to the testing set
+newHDtest <- cbind(hd_testing, dummySex2, dummyFbs2, dummyRestecg2, dummyExang2, dummySlope2, dummayCa2, dummyThal2)
+newHDtest
+
 ```
 ```{r}
-# Regenerate the testing and training sets with the new data frame
+newHDtest = subset(newHDtest, select = -c(2, 3, 6, 7, 9, 11, 12))
+newHDtest
+
+```
+
+
+```{r}
+processminmaxHD <- preProcess(as.data.frame(newHDtrain), method=c("range")) 
+
+newHDtrain <- predict(processminmaxHD,newdata = newHDtrain) 
+
+summary(newHDtrain) # This ensures that everything is in range from 0 - 1
+```
+
+```{r}
+# Do the same as above for the testing set
+newHDtest <- predict(processminmaxHD, newdata = newHDtest) 
+summary(newHDtest)
+```
+```{r}
 set.seed(123)
-intrainKNN <- createDataPartition(y = heart_diseaseKNN$target, p = 0.8, list = FALSE)
-
-trainingKNN <- newHD[intrainKNN,]
-testingKNN <- newHD[-intrainKNN,]
-```
-
-
-```{r}
-processminmaxHD <- preProcess(as.data.frame(trainingKNN), method=c("range")) 
-
-trainingKNN <- predict(processminmaxHD,newdata = trainingKNN) 
-
-summary(trainingKNN) # This ensures that everything is in range from 0 - 1
-```
-
-```{r}
-testingKNN <- predict(processminmaxHD,newdata = testingKNN) 
-summary(testingKNN)
-```
-```{r}
-set.seed(123)
-trainingKNN$target <- factor(trainingKNN$target) # Treat the target as a factor
+newHDtrain$target <- factor(newHDtrain$target) # Treat the target as a factor
 
 trCtrlHD <- trainControl(method="cv") 
-knn_fitHD <- train(target ~ ., data=trainingKNN, method = "knn", trControl = trCtrlHD, tuneLength = 20)
+knn_fitHD <- train(target ~ ., data=newHDtrain, method = "knn", trControl = trCtrlHD, tuneGrid = 20)
 
-knn_fitHD # 9 is the best value here
+knn_fitHD # 9 is the best value here. This is what the model used
 ```
 
 ```{r}
-# Test the KNN model
+# Test the KNN model by fitting the data
 set.seed(123)
-test_pred_hd <- predict(knn_fitHD, newdata = testingKNN)
-test_actual_hd <- as.factor(testingKNN$target)
+test_pred_hd <- predict(knn_fitHD, newdata = newHDtest)
+test_actual_hd <- as.factor(newHDtest$target)
 confusionMatrix(test_actual_hd,test_pred_hd)
 ```
 
 ```{r}
-
-
-
-
+# Summary: The KNN model did an okay job at predicting heart disease. We get a total accuracy of ~ 85 %, which is high but below 90% which is ideal. We also see that there are more false negatives than positives. In our situation, we would prefer that there be more false positives over false negatives. It could be fatal if someone actually has heart disease, but it goes undetected in the model. 
 ```
-
-
-
-
-
-
-
-
-
 
