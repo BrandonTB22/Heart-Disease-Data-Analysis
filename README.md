@@ -1,5 +1,8 @@
 # Data-Science-Final
 
+## Project Slides
+[Slide link](https://docs.google.com/presentation/d/1PccfJUmRKg84kW29Jo_ZNxbFo29SN8ZbZo2wOau7hgE/edit?usp=sharing)
+
 ## Project Overview
 This is our Data Science II Final project. We are working with the Heart Disease dataset from Kaggle to determine what factors can predict weather or no a patient has heart disease. This project includes a creation of three classification models (Logistic regression, KNN, and decision trees) to determine which one is the best model for our client. If you want to explore the dataset yourself, click this link: 
 [https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset](url)
